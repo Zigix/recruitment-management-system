@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.pl.PESEL;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Table(name = "candidate_data")
@@ -24,6 +25,9 @@ public class Candidate {
 
     @Embedded
     private Address address;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "candidate")
+    private List<ExamResult> examResults;
 
     @NotNull
     @OneToOne
