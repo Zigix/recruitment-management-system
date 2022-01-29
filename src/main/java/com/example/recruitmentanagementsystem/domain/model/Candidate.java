@@ -29,6 +29,9 @@ public class Candidate {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "candidate")
     private List<ExamResult> examResults;
 
+    @OneToMany(mappedBy = "candidate")
+    private List<CoursePayment> coursePayments;
+
     @NotNull
     @OneToOne
     private User user;

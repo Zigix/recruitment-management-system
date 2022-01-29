@@ -1,8 +1,10 @@
 package com.example.recruitmentanagementsystem.api;
 
 import com.example.recruitmentanagementsystem.domain.dto.AddExamResultRequest;
+import com.example.recruitmentanagementsystem.domain.dto.CoursePaymentView;
 import com.example.recruitmentanagementsystem.domain.dto.ExamResultView;
 import com.example.recruitmentanagementsystem.domain.dto.UpdateCandidateRequest;
+import com.example.recruitmentanagementsystem.domain.model.CoursePayment;
 import com.example.recruitmentanagementsystem.domain.model.ExamResult;
 import com.example.recruitmentanagementsystem.service.CandidateService;
 import lombok.RequiredArgsConstructor;
@@ -37,5 +39,10 @@ public class CandidateApi {
     @GetMapping("/{id}/exam-results")
     public ResponseEntity<List<ExamResultView>> getAllByCandidate(@PathVariable Long id) {
         return ResponseEntity.ok(candidateService.getAllByCandidate(id));
+    }
+
+    @GetMapping("/courses")
+    public ResponseEntity<List<CoursePaymentView>> getCourses() {
+        return ResponseEntity.ok(candidateService.getCourses());
     }
 }

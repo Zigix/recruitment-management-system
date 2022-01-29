@@ -1,6 +1,8 @@
 package com.example.recruitmentanagementsystem.service;
 
 import com.example.recruitmentanagementsystem.domain.dto.ChangePasswordRequest;
+import com.example.recruitmentanagementsystem.domain.dto.RecruiterView;
+import com.example.recruitmentanagementsystem.domain.model.Role;
 import com.example.recruitmentanagementsystem.domain.model.User;
 import com.example.recruitmentanagementsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,5 +33,17 @@ public class UserService {
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    @Transactional
+    public List<RecruiterView> getAllRecruiters() {
+        return userRepository.findAllByRole(Role.RECRUITER)
+                .stream()
+                .map(user -> {
+                    RecruiterView recruiterView = new RecruiterView();
+                    recruiterView.setId(user.getId());
+                    recruiterView.setEmail(user.getEmail());
+                    return recruiterView;
+                }).toList();
     }
 }

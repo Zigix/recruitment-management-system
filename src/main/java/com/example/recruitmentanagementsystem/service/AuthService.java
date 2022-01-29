@@ -1,9 +1,7 @@
 package com.example.recruitmentanagementsystem.service;
 
 import com.example.recruitmentanagementsystem.configuration.JwtTokenUtil;
-import com.example.recruitmentanagementsystem.domain.dto.CreateRecruiterRequest;
-import com.example.recruitmentanagementsystem.domain.dto.CreateUserRequest;
-import com.example.recruitmentanagementsystem.domain.dto.LoginRequest;
+import com.example.recruitmentanagementsystem.domain.dto.*;
 import com.example.recruitmentanagementsystem.domain.exception.TokenNotFoundException;
 import com.example.recruitmentanagementsystem.domain.model.*;
 import com.example.recruitmentanagementsystem.repository.CandidateRepository;
@@ -129,12 +127,23 @@ public class AuthService {
     }
 
     @Transactional
-    public Map<String, User> login(LoginRequest request) {
+    public AuthenticationResponse login(LoginRequest request) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         User user = getLoggedUser();
-        return Map.of(jwtTokenUtil.generate(authentication), getLoggedUser());
+        return new AuthenticationResponse(
+                jwtTokenUtil.generate(authentication),
+                new UserView(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getUsername(),
+                        user.getCreatedDate(),
+                        user.getRole(),
+                        user.isEnabled(),
+                        candidateRepository.findByUserId(user.getId()).get().getId()
+                )
+        );
     }
 
     public void signUpRecruiter(CreateRecruiterRequest request) {

@@ -1,16 +1,15 @@
 package com.example.recruitmentanagementsystem.service;
 
 import com.example.recruitmentanagementsystem.domain.dto.AddExamResultRequest;
+import com.example.recruitmentanagementsystem.domain.dto.CoursePaymentView;
 import com.example.recruitmentanagementsystem.domain.dto.ExamResultView;
 import com.example.recruitmentanagementsystem.domain.dto.UpdateCandidateRequest;
 import com.example.recruitmentanagementsystem.domain.exception.CandidateNotFoundException;
 import com.example.recruitmentanagementsystem.domain.mapper.CandidateMapper;
 import com.example.recruitmentanagementsystem.domain.mapper.ExamResultMapper;
-import com.example.recruitmentanagementsystem.domain.model.Candidate;
-import com.example.recruitmentanagementsystem.domain.model.ExamResult;
-import com.example.recruitmentanagementsystem.domain.model.Role;
-import com.example.recruitmentanagementsystem.domain.model.User;
+import com.example.recruitmentanagementsystem.domain.model.*;
 import com.example.recruitmentanagementsystem.repository.CandidateRepository;
+import com.example.recruitmentanagementsystem.repository.CoursePaymentRepository;
 import com.example.recruitmentanagementsystem.repository.ExamResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +25,7 @@ public class CandidateService {
     private final CandidateMapper candidateMapper;
     private final ExamResultRepository examResultRepository;
     private final ExamResultMapper examResultMapper;
+    private final CoursePaymentRepository coursePaymentRepository;
 
     @Transactional
     public void update(UpdateCandidateRequest request) {
@@ -69,5 +69,22 @@ public class CandidateService {
                 .stream()
                 .map(examResultMapper::toExamResultView)
                 .toList();
+    }
+
+    @Transactional
+    public List<CoursePaymentView> getCourses() {
+        Candidate candidate = candidateRepository.findByUserId(authService.getLoggedUser().getId())
+                .orElseThrow(() -> new CandidateNotFoundException("Candidate not found"));
+        return coursePaymentRepository.findAllByCandidateId(candidate.getId())
+                .stream()
+                .map(coursePayment -> {
+                    CoursePaymentView coursePaymentView = new CoursePaymentView();
+                    coursePaymentView.setName(coursePayment.getDegreeCourse().getName());
+                    coursePaymentView.setDepartment(coursePayment.getDegreeCourse().getDepartment());
+                    coursePaymentView.setId(coursePayment.getPayment().getId());
+                    coursePaymentView.setAccountNumber(coursePayment.getPayment().getAccountNumber());
+                    coursePaymentView.setAmount(coursePayment.getPayment().getAmount());
+                    return coursePaymentView;
+                }).toList();
     }
 }

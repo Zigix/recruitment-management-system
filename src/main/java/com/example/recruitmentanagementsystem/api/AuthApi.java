@@ -1,5 +1,6 @@
 package com.example.recruitmentanagementsystem.api;
 
+import com.example.recruitmentanagementsystem.domain.dto.AuthenticationResponse;
 import com.example.recruitmentanagementsystem.domain.dto.CreateRecruiterRequest;
 import com.example.recruitmentanagementsystem.domain.dto.CreateUserRequest;
 import com.example.recruitmentanagementsystem.domain.dto.LoginRequest;
@@ -39,7 +40,7 @@ public class AuthApi {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, User>> login(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 }

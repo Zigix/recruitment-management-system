@@ -6,15 +6,21 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "degree_courses")
+@Table(name = "candidate_course_payments")
 @Getter
 @Setter
-public class DegreeCourse {
+public class CoursePayment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String department;
-    private Integer numberOfPlaces;
+
+    @OneToOne
+    private DegreeCourse degreeCourse;
+
+    @OneToOne
+    private Payment payment;
+
+    @ManyToOne
+    private Candidate candidate;
 }
