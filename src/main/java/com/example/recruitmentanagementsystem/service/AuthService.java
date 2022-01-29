@@ -44,21 +44,21 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setUsername(generateUsername());
         user.setPassword(generatePassword());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
         user.setRole(Role.CANDIDATE);
         user.setCreatedDate(Instant.now());
         user.setEnabled(false);
         user = userRepository.save(user);
 
         Candidate candidate = new Candidate();
+        candidate.setFirstName(request.getFirstName());
+        candidate.setLastName(request.getLastName());
         candidate.setPesel(request.getPesel());
         candidate.setUser(user);
         candidateRepository.save(candidate);
 
         String token = generateToken(user);
         String link = TOKEN_BASE_PATH + token;
-        mailService.sendMail(getActivationEmail(user.getEmail(), user.getFirstName(), user.getLastName(), link));
+        mailService.sendMail(getActivationEmail(user.getEmail(), candidate.getFirstName(), candidate.getLastName(), link));
     }
 
     private String generateToken(User user) {
@@ -141,8 +141,6 @@ public class AuthService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCreatedDate(Instant.now());
         user.setRole(Role.RECRUITER);

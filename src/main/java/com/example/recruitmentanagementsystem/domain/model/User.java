@@ -27,8 +27,6 @@ public class User implements UserDetails, Serializable {
     @NotNull
     private String email;
     private String username;
-    private String firstName;
-    private String lastName;
     private String password;
     private Instant createdDate;
 

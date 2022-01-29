@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateRecruiterRequest {
-    private String email;
-    private String username;
-    private String password;
+public class ChangePasswordRequest {
+    private String oldPassword;
+    private String newPassword;
+    private String reNewPassword;
 }

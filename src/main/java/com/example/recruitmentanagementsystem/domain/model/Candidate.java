@@ -15,6 +15,8 @@ public class Candidate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String firstName;
+    private String lastName;
 
     @PESEL @NotNull
     private String pesel;
