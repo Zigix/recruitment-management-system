@@ -1,18 +1,26 @@
 package com.example.recruitmentanagementsystem.service;
 
+import com.example.recruitmentanagementsystem.configuration.JwtTokenUtil;
+import com.example.recruitmentanagementsystem.domain.dto.CreateRecruiterRequest;
 import com.example.recruitmentanagementsystem.domain.dto.CreateUserRequest;
+import com.example.recruitmentanagementsystem.domain.dto.LoginRequest;
 import com.example.recruitmentanagementsystem.domain.exception.TokenNotFoundException;
 import com.example.recruitmentanagementsystem.domain.model.*;
 import com.example.recruitmentanagementsystem.repository.CandidateRepository;
 import com.example.recruitmentanagementsystem.repository.UserRepository;
 import com.example.recruitmentanagementsystem.repository.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -25,7 +33,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final CandidateRepository candidateRepository;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final AuthenticationManager authenticationManager;
     private final MailService mailService;
+    private final JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -108,5 +118,35 @@ public class AuthService {
                 user.getEmail(),
                 subject,
                 text);
+    }
+
+    @Transactional(readOnly = true)
+    public User getLoggedUser() {
+        return (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+    }
+
+    @Transactional
+    public Map<String, User> login(LoginRequest request) {
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        User user = getLoggedUser();
+        return Map.of(jwtTokenUtil.generate(authentication), getLoggedUser());
+    }
+
+    public void signUpRecruiter(CreateRecruiterRequest request) {
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setUsername(request.getUsername());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setCreatedDate(Instant.now());
+        user.setRole(Role.RECRUITER);
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 }
